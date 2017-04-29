@@ -1,6 +1,8 @@
 /*
   Pulse
-  Deliver TTL pulse with timing based on serial commands
+  Deliver TTL pulse with timing based on serial commands.
+  
+  Original code by Abel Corver, modified by Davis Bennett.
   
   This example code is in the public domain.
  */
