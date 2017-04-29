@@ -1,16 +1,13 @@
 /*
-  Blink
-  Turns on an LED on for one second, then off for one second, repeatedly.
+  Pulse
+  Deliver TTL pulse with timing based on serial commands
   
   This example code is in the public domain.
  */
- 
-// Pin 13 has an LED connected on most Arduino boards.
-// Pin 11 has the LED on Teensy 2.0
-// Pin 6  has the LED on Teensy++ 2.0
-// Pin 13 has the LED on Teensy 3.0
-// give it a name:
-const int PIN_LED = 13;
+// Pin 17 has the LED for ProMicro 5V/16MHz (use for debugging) 
+// Pin 0 is the output for this example
+
+const int PIN_OUTPUT = 0;
 
 // ================================================================
 // Helper function for parsing Serial input
@@ -50,36 +47,57 @@ uint8_t parse(char *line, char **argv, uint8_t maxArgs, char sep = ' ') {
 
 void setup() {                
   // initialize the digital pin as an output.
-  pinMode(PIN_LED, OUTPUT);  
-
+  pinMode(PIN_OUTPUT, OUTPUT);   
   Serial.begin(9600);
+  while(!Serial) { delay(1); }
+  cmdIdentify(NULL, NULL);
 }
-
+  
 
 // ================================================================
 // ====== COMMAND: Identify
 // ================================================================
 
 void cmdIdentify(char** pArgs, uint8_t numArgs) {
-  Serial.println("Device ID string --- change this...");
+  Serial.println("ProMicro 5v/16 MHz");
 }
 
 // ================================================================
-// ====== COMMAND: Blink
+// ====== COMMAND: Pulse
 // ================================================================
 
-void cmdBlink(char** pArgs, uint8_t numArgs) {
+void cmdPulse(char** pArgs, uint8_t numArgs) {
 
-  if (numArgs != 1) {
+  if (numArgs != 3) {
     Serial.println("Invalid arguments.");
     return;
   }
 
   int duration = String(pArgs[0]).toInt();
-
-  digitalWrite(PIN_LED, HIGH);
-  delay(duration);
-  digitalWrite(PIN_LED, LOW);
+  int interpulse = String(pArgs[1]).toInt();  
+  int pulseno = String(pArgs[2]).toInt();
+  int counter = 0;
+    
+  while (counter < pulseno)  
+    {
+      // check for halt signal
+      if (Serial.available())
+        {
+          char ch = Serial.read();
+          if (ch == 'q')
+          {
+            Serial.println("Halt command received. Quitting pulse function");
+            return;
+           }
+        }
+      digitalWrite(PIN_OUTPUT, LOW);
+      digitalWrite(PIN_OUTPUT, HIGH);
+      delay(duration);
+      digitalWrite(PIN_OUTPUT, LOW);
+      delay(interpulse);
+      counter++;
+      Serial.println(counter);
+    }
 }
 
 // ================================================================
@@ -93,12 +111,12 @@ void processSerialCommand(char** pArgs, uint8_t numArgs) {
 
   // Determine function to execute
   if (cmd == "h"             ) { fun = &cmdIdentify; } else 
-  if (cmd == "blink"         ) { fun = &cmdBlink; } else 
+  if (cmd == "pulse"         ) { fun = &cmdPulse; } else 
   if (cmd == "?") {
 
     Serial.println("Available commands: ");
     Serial.println("h");
-    Serial.println("blink");
+    Serial.println("pulse");
     return;
   } else {
     
