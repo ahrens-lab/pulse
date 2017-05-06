@@ -9,7 +9,7 @@
 // Pin 17 has the LED for ProMicro 5V/16MHz (use for debugging) 
 // Pin 0 is the output for this example
 
-const int PIN_OUTPUT = 0;
+const int PIN_OUTPUT = 2;
 
 // ================================================================
 // Helper function for parsing Serial input
@@ -78,6 +78,12 @@ void cmdPulse(char** pArgs, uint8_t numArgs) {
   int duration = String(pArgs[0]).toInt();
   int interpulse = String(pArgs[1]).toInt();  
   int pulseno = String(pArgs[2]).toInt();
+  
+  // Handle negative values
+  if (duration < 0){duration = 1;}
+  if (interpulse < 0){interpulse = 1;}
+  if (pulseno < 0){pulseno = 1;}
+  
   int counter = 0;
     
   while (counter < pulseno)  
