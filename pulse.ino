@@ -221,13 +221,13 @@ void cmdPulseTriggered(char** pArgs, uint8_t numArgs) {
                  
          if (spim_plane % plane_stim_interval == 0)         
          {         
-          pulse_state = 2;
-          pulse_train_onset  = micros();
+          pulse_state = 2;          
+          pulse_train_onset  = micros();          
          }
          else {pulse_state = 1;}
       }
       
-      // Transition from state 1 to 0 if its been over 1 ms since the last camera frame
+      // Transition from state 1 to 0 if it's been over 1 ms since the last camera frame signal
       if ((pulse_state == 1) && (time_since_frame > 1000))
       {
         pulse_state = 0;
@@ -310,7 +310,7 @@ void processSerialCommand(char** pArgs, uint8_t numArgs) {
   if (cmd == "h"              ) { fun = &cmdIdentify; } else 
   if (cmd == "pulse"          ) { fun = &cmdPulse; } else 
   if (cmd == "listen"         ) { fun = &cmdListen;} else 
-  if (cmd == "pulse_triggered") { fun = &cmdPulseTriggered;} else  
+  if (cmd == "pulse_triggered") { fun = &cmdPulseTriggered;} else 
   if (cmd == "?") {
 
     Serial.println("Available commands: ");
